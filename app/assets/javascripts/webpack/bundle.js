@@ -46,11 +46,6 @@
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = reducer;
-
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -65,31 +60,17 @@
 
 	var _reactRedux = __webpack_require__(200);
 
+	var _todoApp = __webpack_require__(209);
+
+	var _todoApp2 = _interopRequireDefault(_todoApp);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	// react-dom をimport
-	function reducer() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { tasks: [] };
-	  var action = arguments[1];
-
-	  return state;
-	}
 
 	// reducerを作成し、そのreducerや非同期処理に必要なredux-thunkを持ったStoreを作成。
 	// 作成されたStoreをreact-reduxのProviderを使ってtodo-appコンポーネントに渡す。
 
 	// redux をimport
 	// react をinmport
-	var reduxStore = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
-
-	document.addEventListener('DOMContentLoaded', function () {
-	  (0, _reactDom.render)(_react2.default.createElement(
-	    _reactRedux.Provider,
-	    { store: reduxStore },
-	    _react2.default.createElement(TodoApp, null)
-	  ), document.getElementById('content'));
-	});
-
 	function reducer() {
 	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { tasks: [] };
 	  var action = arguments[1];
@@ -97,10 +78,24 @@
 	  switch (action.type) {
 	    case 'TASKS_LOADED':
 	      return Object.assign({}, state, { tasks: action.data });
+	    case 'TOGGLE_LOADING':
+	      return Object.assign({}, state, { isLoading: action.data });
 	    default:
 	      return state;
 	  }
 	}
+	// react-dom をimport
+
+
+	var reduxStore = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
+
+	document.addEventListener('DOMContentLoaded', function () {
+	  (0, _reactDom.render)(_react2.default.createElement(
+	    _reactRedux.Provider,
+	    { store: reduxStore },
+	    _react2.default.createElement(_todoApp2.default, null)
+	  ), document.getElementById('content'));
+	});
 
 /***/ },
 /* 1 */
@@ -23284,6 +23279,235 @@
 	module.exports = invariant;
 
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(200);
+
+	var _actions = __webpack_require__(210);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	var _taskList = __webpack_require__(211);
+
+	var _taskList2 = _interopRequireDefault(_taskList);
+
+	var _loadingIndicator = __webpack_require__(212);
+
+	var _loadingIndicator2 = _interopRequireDefault(_loadingIndicator);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // ./client/src/components/todo-app.jsx
+
+
+	// react-reduxのconnectを使うとReduxのsubscribeが必要ないらしい。 
+	// todoのリストはtask-listコンポーネントで表示させる。
+
+	var TodoApp = function (_React$Component) {
+	  _inherits(TodoApp, _React$Component);
+
+	  function TodoApp(props) {
+	    _classCallCheck(this, TodoApp);
+
+	    return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
+	  }
+
+	  _createClass(TodoApp, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.props.dispatch(_actions2.default.loadTasks());
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        this.props.isLoading ? _react2.default.createElement(_loadingIndicator2.default, null) : null,
+	        _react2.default.createElement(_taskList2.default, { tasks: this.props.tasks })
+	      );
+	    }
+	  }]);
+
+	  return TodoApp;
+	}(_react2.default.Component);
+
+	function mapStateToProps(state) {
+	  var tasks = state.tasks,
+	      isLoading = state.isLoading;
+
+	  return {
+	    tasks: tasks,
+	    isLoading: isLoading
+	  };
+	}
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(TodoApp);
+
+/***/ },
+/* 210 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	// ./client/src/actions.js
+	module.exports = {
+	  loadTasks: loadTasks
+	};
+
+	function loadTasks() {
+	  return function (dispatch) {
+	    dispatch(toggleLoading(true));
+	    $.ajax({
+	      url: '/api/tasks.json',
+	      dataType: 'json',
+	      success: function success(res) {
+	        dispatch(tasksloaded(res.tasks));
+	        // 追加
+	        dispatch(toggleLoading(false));
+	        // console.log(res);
+	      },
+	      error: function error(xhr, status, err) {
+	        // 追加
+	        dispatch(toggleLoading(false));
+	        console.log('/api/tasks.json', status, err.toString());
+	      }
+	    });
+	  };
+	}
+
+	function tasksloaded(tasks) {
+	  return { type: 'TASKS_LOADED', data: tasks };
+	}
+
+	function toggleLoading(isLoading) {
+	  return { type: 'TOGGLE_LOADING', data: isLoading };
+	}
+
+/***/ },
+/* 211 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // ./client/src/components/task-list.jsx
+
+
+	var TaskList = function (_React$Component) {
+	  _inherits(TaskList, _React$Component);
+
+	  function TaskList() {
+	    _classCallCheck(this, TaskList);
+
+	    return _possibleConstructorReturn(this, (TaskList.__proto__ || Object.getPrototypeOf(TaskList)).apply(this, arguments));
+	  }
+
+	  _createClass(TaskList, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'ul',
+	        null,
+	        this.props.tasks.map(function (task) {
+	          return _react2.default.createElement(
+	            'li',
+	            { key: task.id },
+	            task.name
+	          );
+	        })
+	      );
+	    }
+	  }]);
+
+	  return TaskList;
+	}(_react2.default.Component);
+
+	exports.default = TaskList;
+
+/***/ },
+/* 212 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // ./client/src/components/loading-indicator.jsx
+
+
+	var LoadingIndicator = function (_React$Component) {
+	  _inherits(LoadingIndicator, _React$Component);
+
+	  function LoadingIndicator() {
+	    _classCallCheck(this, LoadingIndicator);
+
+	    return _possibleConstructorReturn(this, (LoadingIndicator.__proto__ || Object.getPrototypeOf(LoadingIndicator)).apply(this, arguments));
+	  }
+
+	  _createClass(LoadingIndicator, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement("img", { src: "/assets/loading.gif", alt: "loading-indicator" })
+	      );
+	    }
+	  }]);
+
+	  return LoadingIndicator;
+	}(_react2.default.Component);
+
+	exports.default = LoadingIndicator;
 
 /***/ }
 /******/ ]);
